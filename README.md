@@ -9,12 +9,11 @@
 
 | # | Nombre completo | Código |
 |---|-----------------|--------|
-| 1 | _______________________ | __________ |
-| 2 | _______________________ | __________ |
-| 3 | _______________________ | __________ |
+| 1 | Juan Esteban Romero Mosquera| 82202524107 |
 
-**Docente:** _______________________
-**Fecha de entrega:** _______________________
+
+**Docente:** Natalia Marcela Castellano Gomez
+**Fecha de entrega:** 18/10/2026
 
 ---
 
@@ -22,7 +21,7 @@
 
 Esta es la primera versión de un **Sistema de Gestión Académica**. Todas las clases forman un único sistema: cada parte se conecta con las demás.
 
-- Un **Programa Académico** (por ejemplo, Ingeniería de Sistemas) pertenece a una facultad y tiene un número de semestres.
+- Un **Programa Académico** (por ejemplo, Ingeniería de Sistemas y Telecomunicaciones) pertenece a una facultad y tiene un número de semestres.
 - Cada **Asignatura** pertenece a un programa académico y tiene un número de créditos.
 - Las **Personas** de la universidad se dividen en tres roles:
   - **Estudiante**: está matriculado en un programa, cursa un semestre, tiene un promedio e inscribe asignaturas.
