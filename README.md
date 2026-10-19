@@ -189,10 +189,10 @@ En cumplimiento de los lineamientos institucionales de la Universidad de Manizal
 | Aspecto | Detalle |
 |--------|---------|
 | **Herramienta utilizada** | Claude (Anthropic), mediante Claude Code |
-| **Fecha de uso** | ____ / ____ / ________ |
+| **Fecha de uso** | 18 / 10 / 2026 |
 | **Propósito** | Apoyo en la generación de la estructura inicial del código (`modelos.py`, `main.py`) y en la redacción de este documento `README.md`. |
-| **Instrucción (prompt) principal** | Se solicitó construir un sistema de gestión académica en Python que aplicara encapsulamiento, herencia, sobreescritura y polimorfismo, según los requerimientos del taller. |
-| **Revisión humana** | Los integrantes revisaron, ejecutaron y comprendieron el código generado, y verificaron que cumpliera cada requerimiento del enunciado. *(Describan aquí las modificaciones que hicieron por cuenta propia.)* |
+| **Instrucción (prompt) principal** | Se solicitó tutoría para hacer la actividad.
+| **Revisión humana** | Los integrantes revisaron, ejecutaron y comprendieron el código generado, y verificaron que cumpliera cada requerimiento del enunciado.
 
 Los integrantes declaran que:
 
@@ -200,10 +200,3 @@ Los integrantes declaran que:
 2. La herramienta de IA se usó como **apoyo al aprendizaje** y no como sustituto del trabajo académico propio.
 3. Asumen la responsabilidad total por el contenido de esta entrega.
 
-> **Nota para los integrantes:** antes de entregar, consulten los lineamientos vigentes de la Universidad y del docente del curso sobre el uso de IA, y ajusten esta sección si exigen un formato específico.
-
-**Firmas de los integrantes:**
-
-- _______________________
-- _______________________
-- _______________________
