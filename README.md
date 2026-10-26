@@ -275,7 +275,7 @@ En cumplimiento de los lineamientos institucionales de la Universidad de Manizal
 | Aspecto | Detalle |
 |--------|---------|
 | **Herramienta utilizada** | Claude (Anthropic), mediante Claude Code |
-| **Fecha de uso** | 18 / 10 / 2026 |
+| **Fecha de uso** | 25 / 10 / 2026 |
 | **Propósito** | Apoyo en la generación de la estructura inicial del código (`modelos.py`, `main.py`) y en la redacción de este documento `README.md`. |
 | **Instrucción (prompt) principal** | Se solicitó tutoría para hacer la actividad.
 | **Revisión humana** | Los integrantes revisaron, ejecutaron y comprendieron el código generado, y verificaron que cumpliera cada requerimiento del enunciado.
