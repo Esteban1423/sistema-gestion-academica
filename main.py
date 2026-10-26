@@ -6,11 +6,21 @@ Ejecutar con:
 """
 
 from modelos import (
+    Persona,
     ProgramaAcademico,
     Asignatura,
     Estudiante,
     Docente,
     Administrativo,
+    GrupoAcademico,
+    CatalogoAcademico,
+)
+from excepciones import (
+    EstudianteYaMatriculadoError,
+    GrupoLlenoError,
+    EstudianteNoMatriculadoError,
+    AsignaturaNoEncontradaError,
+    ProgramaNoEncontradoError,
 )
 
 
@@ -148,6 +158,112 @@ def main():
     for persona in personas:
         print()
         persona.mostrar_informacion()
+        persona.realizar_actividad_principal()
+
+    # ==================================================================
+    # ACTIVIDAD COLABORATIVA N°2
+    # ==================================================================
+
+    # ------------------------------------------------------------------
+    # 6. Persona es abstracta
+    # ------------------------------------------------------------------
+    titulo("6. PERSONA ES UNA CLASE ABSTRACTA")
+
+    print("\n- Intento: crear directamente una Persona")
+    try:
+        Persona("1", "Persona Genérica", "generica@umanizales.edu.co")
+        print("  (!) Se creó la persona: la clase no es abstracta.")
+    except TypeError as error:
+        print(f"  Creación bloqueada -> {error}")
+
+    # ------------------------------------------------------------------
+    # 7. Grupos académicos (cada grupo crea su propio Horario)
+    # ------------------------------------------------------------------
+    titulo("7. CREACIÓN DE GRUPOS ACADÉMICOS Y HORARIOS")
+
+    catalogo = CatalogoAcademico()
+    for programa in (ing_sistemas, contaduria):
+        catalogo.registrar_programa(programa)
+    for asignatura in (programacion, estructuras, contabilidad):
+        catalogo.registrar_asignatura(asignatura)
+
+    est3 = Estudiante("1053000003", "Sofía Ramírez", "sofia.ramirez@umanizales.edu.co",
+                      "EST-2024-078", ing_sistemas, 2, 4.5)
+    est4 = Estudiante("1053000004", "Camilo Torres", "camilo.torres@umanizales.edu.co",
+                      "EST-2024-102", ing_sistemas, 3, 3.9)
+
+    grupo_prg = GrupoAcademico("PRG1-01", catalogo.buscar_asignatura("PRG1"), doc1,
+                               2, "Lunes", "08:00", "10:00", "B-204")
+    grupo_edd = GrupoAcademico("EDD-01", catalogo.buscar_asignatura("EDD"), doc1,
+                               3, "Miércoles", "14:00", "16:00", "Lab-3")
+
+    grupo_prg.mostrar_informacion_grupo()
+    grupo_edd.mostrar_informacion_grupo()
+
+    # ------------------------------------------------------------------
+    # 8. Matrículas y retiros (cada situación excepcional se captura)
+    # ------------------------------------------------------------------
+    titulo("8. MATRÍCULA Y RETIRO DE ESTUDIANTES")
+
+    print("\n- Matrícula correcta")
+    grupo_prg.matricular_estudiante(est1)
+    grupo_prg.matricular_estudiante(est3)
+    grupo_edd.matricular_estudiante(est1)
+    grupo_prg.mostrar_estudiantes()
+
+    print("\n- Intento: matricular un estudiante duplicado")
+    try:
+        grupo_prg.matricular_estudiante(est1)
+    except EstudianteYaMatriculadoError as error:
+        print(f"  Excepción controlada -> {error}")
+
+    print("\n- Intento: superar la capacidad del grupo (máx. 2)")
+    try:
+        grupo_prg.matricular_estudiante(est4)
+    except GrupoLlenoError as error:
+        print(f"  Excepción controlada -> {error}")
+
+    print("\n- Retiro correcto")
+    retirado = grupo_prg.retirar_estudiante("EST-2024-078")
+    print(f"  Se retiró a {retirado.nombre}.")
+    grupo_prg.mostrar_estudiantes()
+
+    print("\n- Intento: retirar un estudiante que no está matriculado")
+    try:
+        grupo_prg.retirar_estudiante("EST-9999-999")
+    except EstudianteNoMatriculadoError as error:
+        print(f"  Excepción controlada -> {error}")
+
+    print("\nEl programa continúa: ahora cabe un cupo y se matricula a otro estudiante.")
+    grupo_prg.matricular_estudiante(est4)
+    grupo_prg.mostrar_informacion_grupo()
+
+    # ------------------------------------------------------------------
+    # 9. Búsquedas inexistentes
+    # ------------------------------------------------------------------
+    titulo("9. BÚSQUEDAS EN EL CATÁLOGO")
+
+    print("\n- Intento: buscar una asignatura inexistente")
+    try:
+        catalogo.buscar_asignatura("FIS1")
+    except AsignaturaNoEncontradaError as error:
+        print(f"  Excepción controlada -> {error}")
+
+    print("\n- Intento: buscar un programa inexistente")
+    try:
+        catalogo.buscar_programa("MED")
+    except ProgramaNoEncontradoError as error:
+        print(f"  Excepción controlada -> {error}")
+
+    print("\n- Búsqueda válida tras los errores:")
+    print(f"  {catalogo.buscar_programa('ISC')}")
+
+    # ------------------------------------------------------------------
+    # 10. El polimorfismo se conserva con la clase abstracta
+    # ------------------------------------------------------------------
+    titulo("10. POLIMORFISMO CON PERSONA ABSTRACTA")
+
+    for persona in [est1, doc1, adm1, est3, doc2, adm2]:
         persona.realizar_actividad_principal()
 
     titulo("FIN DE LAS PRUEBAS")

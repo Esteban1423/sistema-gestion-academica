@@ -2,16 +2,29 @@
 Modelos del Sistema de Gestión Académica - Universidad de Manizales.
 
 Contiene todas las clases del dominio:
-    - Persona (clase base)
+    - Persona (clase abstracta)
         - Estudiante
         - Docente
         - Administrativo
     - ProgramaAcademico
     - Asignatura
+    - Horario
+    - GrupoAcademico (contiene un Horario: composición)
 
 Los atributos están encapsulados (prefijo "_") y se acceden mediante
 propiedades (@property), que actúan como getters y setters con validación.
 """
+
+from abc import ABC, abstractmethod
+from datetime import datetime
+
+from excepciones import (
+    EstudianteYaMatriculadoError,
+    GrupoLlenoError,
+    EstudianteNoMatriculadoError,
+    AsignaturaNoEncontradaError,
+    ProgramaNoEncontradoError,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -140,8 +153,12 @@ class Asignatura:
 # Jerarquía de personas
 # ---------------------------------------------------------------------------
 
-class Persona:
-    """Clase base con los datos comunes a todas las personas de la universidad."""
+class Persona(ABC):
+    """Clase abstracta con los datos comunes a todas las personas de la universidad.
+
+    No se puede instanciar directamente: toda persona debe ser un Estudiante,
+    un Docente o un Administrativo.
+    """
 
     def __init__(self, identificacion, nombre, correo):
         self.identificacion = identificacion
@@ -180,9 +197,9 @@ class Persona:
         print(f"  Nombre: {self._nombre}")
         print(f"  Correo: {self._correo}")
 
+    @abstractmethod
     def realizar_actividad_principal(self):
         """Cada subclase debe definir su propia actividad principal."""
-        raise NotImplementedError("Las subclases deben implementar realizar_actividad_principal().")
 
 
 class Estudiante(Persona):
@@ -388,3 +405,210 @@ class Administrativo(Persona):
     def realizar_actividad_principal(self):
         print(f"  >> {self._nombre} está gestionando trámites como {self._cargo} "
               f"en {self._dependencia} (jornada {self._jornada.lower()}).")
+
+
+# ---------------------------------------------------------------------------
+# Oferta académica: horarios, grupos y catálogo
+# ---------------------------------------------------------------------------
+
+class Horario:
+    """Describe cuándo y dónde se dicta un grupo académico.
+
+    Un Horario no existe por sí solo: lo crea y lo posee un GrupoAcademico
+    (relación de composición).
+    """
+
+    DIAS_VALIDOS = ("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
+    FORMATO_HORA = "%H:%M"
+
+    def __init__(self, dia, hora_inicio, hora_fin, salon):
+        self.dia = dia
+        self._hora_inicio = self._validar_hora(hora_inicio, "hora de inicio")
+        self.hora_fin = hora_fin
+        self.salon = salon
+
+    @classmethod
+    def _validar_hora(cls, valor, campo):
+        texto = _validar_texto(valor, campo)
+        try:
+            datetime.strptime(texto, cls.FORMATO_HORA)
+        except ValueError:
+            raise ValueError(f"La {campo} '{texto}' no tiene el formato HH:MM (ej. 08:00).")
+        return texto
+
+    @property
+    def dia(self):
+        return self._dia
+
+    @dia.setter
+    def dia(self, valor):
+        dia = _validar_texto(valor, "día").capitalize()
+        if dia not in self.DIAS_VALIDOS:
+            raise ValueError(f"El día '{dia}' no es válido. Opciones: {', '.join(self.DIAS_VALIDOS)}.")
+        self._dia = dia
+
+    @property
+    def hora_inicio(self):
+        return self._hora_inicio
+
+    @hora_inicio.setter
+    def hora_inicio(self, valor):
+        hora = self._validar_hora(valor, "hora de inicio")
+        if hasattr(self, "_hora_fin") and hora >= self._hora_fin:
+            raise ValueError("La hora de inicio debe ser anterior a la hora de finalización.")
+        self._hora_inicio = hora
+
+    @property
+    def hora_fin(self):
+        return self._hora_fin
+
+    @hora_fin.setter
+    def hora_fin(self, valor):
+        hora = self._validar_hora(valor, "hora de finalización")
+        if hora <= self._hora_inicio:
+            raise ValueError("La hora de finalización debe ser posterior a la hora de inicio.")
+        self._hora_fin = hora
+
+    @property
+    def salon(self):
+        return self._salon
+
+    @salon.setter
+    def salon(self, valor):
+        self._salon = _validar_texto(valor, "salón")
+
+    def __str__(self):
+        return f"{self._dia} {self._hora_inicio}-{self._hora_fin} (Salón {self._salon})"
+
+
+class GrupoAcademico:
+    """Grupo en el que se ofrece una asignatura, con su docente, cupo y horario.
+
+    Recibe objetos ya creados de Asignatura y Docente (asociación) y crea
+    internamente su Horario (composición): si el grupo desaparece, su horario
+    también.
+    """
+
+    def __init__(self, codigo, asignatura, docente, capacidad_maxima, dia, hora_inicio, hora_fin, salon):
+        self.codigo = codigo
+        self.asignatura = asignatura
+        self.docente = docente
+        self.capacidad_maxima = capacidad_maxima
+        self._horario = Horario(dia, hora_inicio, hora_fin, salon)
+        self._estudiantes = []
+
+    @property
+    def codigo(self):
+        return self._codigo
+
+    @codigo.setter
+    def codigo(self, valor):
+        self._codigo = _validar_texto(valor, "código del grupo")
+
+    @property
+    def asignatura(self):
+        return self._asignatura
+
+    @asignatura.setter
+    def asignatura(self, valor):
+        if not isinstance(valor, Asignatura):
+            raise ValueError("El grupo debe recibir un objeto Asignatura.")
+        self._asignatura = valor
+
+    @property
+    def docente(self):
+        return self._docente
+
+    @docente.setter
+    def docente(self, valor):
+        if not isinstance(valor, Docente):
+            raise ValueError("El grupo debe recibir un objeto Docente.")
+        self._docente = valor
+
+    @property
+    def capacidad_maxima(self):
+        return self._capacidad_maxima
+
+    @capacidad_maxima.setter
+    def capacidad_maxima(self, valor):
+        valor = _validar_entero_positivo(valor, "capacidad máxima")
+        if hasattr(self, "_estudiantes") and valor < len(self._estudiantes):
+            raise ValueError("La capacidad no puede ser menor que el número de estudiantes matriculados.")
+        self._capacidad_maxima = valor
+
+    @property
+    def horario(self):
+        return self._horario
+
+    @property
+    def estudiantes(self):
+        # Copia, para que la lista interna no se modifique desde fuera.
+        return list(self._estudiantes)
+
+    @property
+    def cupos_disponibles(self):
+        return self._capacidad_maxima - len(self._estudiantes)
+
+    def _buscar_estudiante(self, codigo_estudiantil):
+        for estudiante in self._estudiantes:
+            if estudiante.codigo_estudiantil == codigo_estudiantil:
+                return estudiante
+        return None
+
+    def matricular_estudiante(self, estudiante):
+        """Matricula un estudiante. Lanza EstudianteYaMatriculadoError o GrupoLlenoError."""
+        if not isinstance(estudiante, Estudiante):
+            raise ValueError("Solo se pueden matricular objetos de tipo Estudiante.")
+        if self._buscar_estudiante(estudiante.codigo_estudiantil) is not None:
+            raise EstudianteYaMatriculadoError(estudiante.codigo_estudiantil, self._codigo)
+        if len(self._estudiantes) >= self._capacidad_maxima:
+            raise GrupoLlenoError(self._codigo, self._capacidad_maxima)
+        self._estudiantes.append(estudiante)
+
+    def retirar_estudiante(self, codigo_estudiantil):
+        """Retira un estudiante por su código. Lanza EstudianteNoMatriculadoError."""
+        estudiante = self._buscar_estudiante(codigo_estudiantil)
+        if estudiante is None:
+            raise EstudianteNoMatriculadoError(codigo_estudiantil, self._codigo)
+        self._estudiantes.remove(estudiante)
+        return estudiante
+
+    def mostrar_informacion_grupo(self):
+        print(f"  Grupo: [{self._codigo}] {self._asignatura.nombre}")
+        print(f"    Docente: {self._docente.nombre}")
+        print(f"    Horario: {self._horario}")
+        print(f"    Cupos: {len(self._estudiantes)}/{self._capacidad_maxima} "
+              f"({self.cupos_disponibles} disponibles)")
+
+    def mostrar_estudiantes(self):
+        print(f"  Estudiantes del grupo {self._codigo}:")
+        if not self._estudiantes:
+            print("    (sin estudiantes matriculados)")
+        for i, estudiante in enumerate(self._estudiantes, start=1):
+            print(f"    {i}. {estudiante.nombre} ({estudiante.codigo_estudiantil})")
+
+
+class CatalogoAcademico:
+    """Registro de programas y asignaturas con búsqueda por código."""
+
+    def __init__(self):
+        self._programas = {}
+        self._asignaturas = {}
+
+    def registrar_programa(self, programa):
+        self._programas[programa.codigo] = programa
+
+    def registrar_asignatura(self, asignatura):
+        self._asignaturas[asignatura.codigo] = asignatura
+
+    def buscar_programa(self, codigo):
+        """Devuelve el programa o lanza ProgramaNoEncontradoError."""
+        if codigo not in self._programas:
+            raise ProgramaNoEncontradoError(codigo)
+        return self._programas[codigo]
+
+    def buscar_asignatura(self, codigo):
+        """Devuelve la asignatura o lanza AsignaturaNoEncontradaError."""
+        if codigo not in self._asignaturas:
+            raise AsignaturaNoEncontradaError(codigo)
+        return self._asignaturas[codigo]
