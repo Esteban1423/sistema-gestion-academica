@@ -7,12 +7,11 @@
 
 ---
 
-## Integrantes
+## Autor
 
-| # | Nombre completo | Código |
-|---|-----------------|--------|
-| 1 | Juan Esteban Romero Mosquera| 82202524107 |
-| 2 | Geidy Nataly Vasquez Lopez |  |
+| Nombre completo | Código |
+|-----------------|--------|
+| Juan Esteban Romero Mosquera | 82202524107 |
 
 
 **Docente:** Natalia Marcela Castellano Gomez
@@ -270,7 +269,7 @@ El documento técnico de decisiones está en [`docs/Documento_Decisiones_Diseno_
 
 ## 6. Declaración del uso de herramientas de Inteligencia Artificial
 
-En cumplimiento de los lineamientos institucionales de la Universidad de Manizales sobre el uso ético y transparente de la Inteligencia Artificial en las actividades académicas, los integrantes del grupo declaran lo siguiente:
+En cumplimiento de los lineamientos institucionales de la Universidad de Manizales sobre el uso ético y transparente de la Inteligencia Artificial en las actividades académicas, el autor declara lo siguiente:
 
 | Aspecto | Detalle |
 |--------|---------|
@@ -278,11 +277,11 @@ En cumplimiento de los lineamientos institucionales de la Universidad de Manizal
 | **Fecha de uso** | 25 / 10 / 2026 |
 | **Propósito** | Apoyo en la generación de la estructura inicial del código (`modelos.py`, `main.py`) y en la redacción de este documento `README.md`. |
 | **Instrucción (prompt) principal** | Se solicitó tutoría para hacer la actividad.
-| **Revisión humana** | Los integrantes revisaron, ejecutaron y comprendieron el código generado, y verificaron que cumpliera cada requerimiento del enunciado.
+| **Revisión humana** | El autor revisó, ejecutó y comprendió el código generado, y verificaron que cumpliera cada requerimiento del enunciado.
 
-Los integrantes declaran que:
+El autor declara que:
 
 1. Comprenden el funcionamiento de todo el código entregado y pueden explicarlo y sustentarlo.
 2. La herramienta de IA se usó como **apoyo al aprendizaje** y no como sustituto del trabajo académico propio.
-3. Asumen la responsabilidad total por el contenido de esta entrega.
+3. Asume la responsabilidad total por el contenido de esta entrega.
 
